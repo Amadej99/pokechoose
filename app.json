@@ -3,6 +3,7 @@
     "name": "pokechoose",
     "slug": "pokechoose",
     "version": "1.0.0",
+    "owner": "amadej99",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
