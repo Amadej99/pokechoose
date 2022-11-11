@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { PokemonClient } from "pokenode-ts";
 
-export function usePokemonPair([id1, id2]) {
+export function usePokemonPair([id1, id2]: number[]) {
   const [pokemon1, setPokemon1] = useState(null);
   const [pokemon2, setPokemon2] = useState(null);
 
