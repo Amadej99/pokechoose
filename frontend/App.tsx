@@ -5,22 +5,29 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
 import { getRandomPair } from "./utils/getRandomId";
 import { usePokemonPair } from "./utils/usePokemonPair";
+import { checkAndCreate } from "./utils/checkAndCreate";
 import { Pokemon } from "pokenode-ts";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
   const [IdPair, setIdPair] = useState(getRandomPair([]));
-  const [nextIdPair, setNextIdPair] = useState(getRandomPair([]));
+  const [nextIdPair, setNextIdPair] = useState(getRandomPair([[]]));
+
   const [choiceId, setChoiceId] = useState(null);
 
   let [pokemon1, pokemon2]: Pokemon[] = usePokemonPair(IdPair);
   const [nextPokemon1, nextPokemon2]: Pokemon[] = usePokemonPair(nextIdPair);
 
-  useEffect(() => {
-    [pokemon1, pokemon2] = [nextPokemon1, nextPokemon2];
+  function fetchNextPair() {
     setIdPair(nextIdPair);
     setNextIdPair(getRandomPair(IdPair));
-  }, [choiceId]);
+  }
+
+  useEffect(() => {
+    if (nextPokemon1 && nextPokemon2) {
+      checkAndCreate([nextPokemon1, nextPokemon2]);
+    }
+  }, [nextPokemon1 && nextPokemon2]);
 
   return (
     <NavigationContainer>
@@ -28,25 +35,39 @@ export default function App() {
         <StatusBar style="light" />
         <View className="flex min-h-screen items-center justify-center bg-pokeblue">
           {pokemon1 && pokemon2 ? (
-            <View className="flex flex-col items-center justify-center ">
-              <TouchableOpacity onPress={() => setChoiceId(pokemon1.id)}>
-                <Image
-                  source={{
-                    uri: pokemon1.sprites.front_default,
-                    width: 200,
-                    height: 200,
-                  }}
-                ></Image>
+            <View className="flex flex-col items-center justify-center space-y-5">
+              <TouchableOpacity
+                onPress={() => {
+                  fetchNextPair();
+                }}
+              >
+                <View>
+                  <Image
+                    source={{
+                      uri: pokemon1.sprites.front_default,
+                      width: 200,
+                      height: 200,
+                    }}
+                  ></Image>
+                  <Text className="self-center capitalize text-pokeorange">
+                    {pokemon1.name}
+                  </Text>
+                </View>
               </TouchableOpacity>
               <Text className="text-lg font-bold text-pokeorange">VS.</Text>
-              <TouchableOpacity onPress={() => setChoiceId(pokemon2.id)}>
-                <Image
-                  source={{
-                    uri: pokemon2.sprites.front_default,
-                    width: 200,
-                    height: 200,
-                  }}
-                ></Image>
+              <TouchableOpacity onPress={() => fetchNextPair()}>
+                <View>
+                  <Image
+                    source={{
+                      uri: pokemon2.sprites.front_default,
+                      width: 200,
+                      height: 200,
+                    }}
+                  ></Image>
+                  <Text className="self-center capitalize text-pokeorange">
+                    {pokemon2.name}
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
           ) : (
