@@ -37,7 +37,17 @@ export default function App() {
           {pokemon1 && pokemon2 ? (
             <View className="flex flex-col items-center justify-center space-y-5">
               <TouchableOpacity
-                onPress={() => {
+                onPress={async () => {
+                  await fetch("http://192.168.0.33:8000/pokemon/rate", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      upvote: pokemon1.id,
+                      downvote: pokemon2.id,
+                    }),
+                  });
                   fetchNextPair();
                 }}
               >
@@ -55,7 +65,21 @@ export default function App() {
                 </View>
               </TouchableOpacity>
               <Text className="text-lg font-bold text-pokeorange">VS.</Text>
-              <TouchableOpacity onPress={() => fetchNextPair()}>
+              <TouchableOpacity
+                onPress={async () => {
+                  await fetch("http://192.168.0.33:8000/pokemon/rate", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      upvote: pokemon2.id,
+                      downvote: pokemon1.id,
+                    }),
+                  });
+                  fetchNextPair();
+                }}
+              >
                 <View>
                   <Image
                     source={{

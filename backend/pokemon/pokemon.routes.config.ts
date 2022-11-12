@@ -41,14 +41,25 @@ export class PokemonRoutes {
       });
 
     this.app
-      .route(`/pokemon/:id/upvote`)
+      .route(`/pokemon/rate`)
       .post(async (req: express.Request, res: express.Response) => {
         const pokemon = await prisma.pokemon.update({
           where: {
-            id: Number(req.params.id),
+            id: Number(req.body.upvote),
           },
           data: {
             votedFor: {
+              increment: 1,
+            },
+          },
+        });
+
+        const pokemon2 = await prisma.pokemon.update({
+          where: {
+            id: Number(req.body.downvote),
+          },
+          data: {
+            votedAgainst: {
               increment: 1,
             },
           },
