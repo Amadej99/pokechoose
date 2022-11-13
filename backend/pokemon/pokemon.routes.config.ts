@@ -111,8 +111,33 @@ export class PokemonRoutes {
 
     this.app
       .route(`/pokemon/results`)
-      .get((req: express.Request, res: express.Response) => {
-        res.status(200).send(`Return results.`);
+      .get(async (req: express.Request, res: express.Response) => {
+        const pokemon = await prisma.pokemon.findMany({
+          where: {
+            OR: [
+              {
+                votedFor: {
+                  gt: 0,
+                },
+              },
+              {
+                votedAgainst: {
+                  gt: 0,
+                },
+              },
+            ],
+          },
+          take: 20,
+        });
+
+        pokemon.sort((a, b) => {
+          return (
+            b.votedFor / (b.votedFor + b.votedAgainst) -
+            a.votedFor / (a.votedFor + a.votedAgainst)
+          );
+        });
+
+        res.status(200).send(pokemon);
       });
 
     return this.app;
