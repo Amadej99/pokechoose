@@ -1,104 +1,46 @@
-import { StatusBar } from "expo-status-bar";
-import { Text, View, Image, TouchableOpacity } from "react-native";
+// In App.js in a new project
+
+import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import React, { useEffect, useState } from "react";
-import { getRandomPair } from "./utils/getRandomId";
-import { usePokemonPair } from "./utils/usePokemonPair";
-import { checkAndCreate } from "./utils/checkAndCreate";
-import { Pokemon } from "pokenode-ts";
+import HomeScreen from "./pages/HomeScreen";
+import ChoosingScreen from "./pages/ChoosingScreen";
+import ResultsScreen from "./pages/ResultsScreen";
 
-export default function App() {
-  const Stack = createNativeStackNavigator();
-  const [IdPair, setIdPair] = useState(getRandomPair([]));
-  const [nextIdPair, setNextIdPair] = useState(getRandomPair([[]]));
+const Stack = createNativeStackNavigator();
 
-  const [choiceId, setChoiceId] = useState(null);
-
-  let [pokemon1, pokemon2]: Pokemon[] = usePokemonPair(IdPair);
-  const [nextPokemon1, nextPokemon2]: Pokemon[] = usePokemonPair(nextIdPair);
-
-  function fetchNextPair() {
-    setIdPair(nextIdPair);
-    setNextIdPair(getRandomPair(IdPair));
-  }
-
-  useEffect(() => {
-    if (nextPokemon1 && nextPokemon2) {
-      checkAndCreate([nextPokemon1, nextPokemon2]);
-    }
-  }, [nextPokemon1 && nextPokemon2]);
-
+function App() {
   return (
     <NavigationContainer>
-      <>
-        <StatusBar style="light" />
-        <View className="flex min-h-screen items-center justify-center bg-pokeblue">
-          {pokemon1 && pokemon2 ? (
-            <View className="flex flex-col items-center justify-center space-y-5">
-              <TouchableOpacity
-                onPress={async () => {
-                  await fetch("http://192.168.0.33:8000/pokemon/rate", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      upvote: pokemon1.id,
-                      downvote: pokemon2.id,
-                    }),
-                  });
-                  fetchNextPair();
-                }}
-              >
-                <View>
-                  <Image
-                    source={{
-                      uri: pokemon1.sprites.front_default,
-                      width: 200,
-                      height: 200,
-                    }}
-                  ></Image>
-                  <Text className="self-center capitalize text-pokeorange">
-                    {pokemon1.name}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              <Text className="text-lg font-bold text-pokeorange">VS.</Text>
-              <TouchableOpacity
-                onPress={async () => {
-                  await fetch("http://192.168.0.33:8000/pokemon/rate", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      upvote: pokemon2.id,
-                      downvote: pokemon1.id,
-                    }),
-                  });
-                  fetchNextPair();
-                }}
-              >
-                <View>
-                  <Image
-                    source={{
-                      uri: pokemon2.sprites.front_default,
-                      width: 200,
-                      height: 200,
-                    }}
-                  ></Image>
-                  <Text className="self-center capitalize text-pokeorange">
-                    {pokemon2.name}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <Text>Loading...</Text>
-          )}
-        </View>
-      </>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen
+          name="Home"
+          options={{
+            headerShown: false,
+          }}
+          component={HomeScreen}
+        />
+        <Stack.Screen
+          name="ChoosingScreen"
+          component={ChoosingScreen}
+          options={{
+            headerTransparent: true,
+            title: "",
+            headerTintColor: "#fff",
+          }}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="ResultsScreen"
+          component={ResultsScreen}
+          options={{
+            headerTransparent: true,
+            title: "",
+            headerTintColor: "#fff",
+          }}
+        ></Stack.Screen>
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
+export default App;
