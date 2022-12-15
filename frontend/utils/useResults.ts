@@ -5,7 +5,9 @@ export function useResults() {
 
   useEffect(() => {
     async function getResults() {
-      const response = await fetch("http://192.168.0.33:8000/pokemon/results");
+      const response = await fetch(
+        "http://192.168.50.136:8000/pokemon/results"
+      );
       const results = await response.json();
 
       console.log(results);

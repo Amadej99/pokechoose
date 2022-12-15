@@ -10,7 +10,7 @@ export async function checkAndCreate(pokemon: Pokemon[]) {
     };
   });
 
-  const response = await fetch("http://192.168.0.33:8000/pokemonCreate", {
+  const response = await fetch("http://192.168.50.136:8000/pokemonCreate", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
