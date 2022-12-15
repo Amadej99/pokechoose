@@ -14,18 +14,6 @@ const ResultsScreen = ({ navigation }) => {
   const results = useResults();
   if (!results) return <Text>Loading...</Text>;
 
-  results.map((pokemon: Pokemon) => {
-    console.log(
-      pokemon.name +
-        " " +
-        Number(
-          Number(pokemon.votedFor) /
-            (Number(pokemon.votedFor) + Number(pokemon.votedAgainst))
-        ) *
-          100
-    );
-  });
-
   return (
     <View className="min-h-screen bg-pokeblue">
       <ScrollView className="mt-24 flex flex-col space-y-2 bg-pokeblue">
