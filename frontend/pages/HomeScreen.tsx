@@ -16,6 +16,15 @@ const HomeScreen = ({ navigation }) => {
       >
         <Text className="text-4xl font-bold text-pokeblue">Results</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        className="rounded bg-pokeorange px-2 py-1"
+        onPress={() => navigation.navigate("PrivateResultsScreen")}
+      >
+        <Text className="text-4xl font-bold text-pokeblue">
+          Personal Results
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
