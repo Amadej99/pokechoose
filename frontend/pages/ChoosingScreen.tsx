@@ -3,27 +3,31 @@ import { Text, View, Image, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { getRandomPair } from "../utils/getRandomId";
 import { usePokemonPair } from "../utils/usePokemonPair";
-import { checkAndCreate } from "../utils/checkAndCreate";
 import { Pokemon } from "pokenode-ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function App({ navigation }) {
-  const [IdPair, setIdPair] = useState(getRandomPair([]));
-  const [nextIdPair, setNextIdPair] = useState(getRandomPair([[]]));
   const [alreadyRated, setAlreadyRated] = useState([]);
-
-  console.log(alreadyRated);
+  const [resultsStorage, setResultsStorage] = useState([]);
 
   useEffect(() => {
     async function getStorage() {
-      const storage = await AsyncStorage.getItem("alreadyRated");
-      if (storage) {
-        setAlreadyRated(JSON.parse(storage));
+      const alreadyRatedStorage = await AsyncStorage.getItem("alreadyRated");
+      if (alreadyRatedStorage) {
+        setAlreadyRated(JSON.parse(alreadyRatedStorage));
+      }
+
+      const resultsStorage = await AsyncStorage.getItem("personalResults");
+      if (resultsStorage) {
+        setResultsStorage(JSON.parse(resultsStorage));
       }
     }
 
     getStorage();
   }, []);
+
+  const [IdPair, setIdPair] = useState(getRandomPair(alreadyRated));
+  const [nextIdPair, setNextIdPair] = useState(getRandomPair([[]]));
 
   useEffect(() => {
     async function setStorage() {
@@ -33,6 +37,19 @@ export default function App({ navigation }) {
       setStorage();
     }
   }, [alreadyRated]);
+
+  useEffect(() => {
+    setResultsStorage(resultsStorage.sort((a, b) => a.id - b.id));
+    async function setStorage() {
+      await AsyncStorage.setItem(
+        "personalResults",
+        JSON.stringify(resultsStorage)
+      );
+    }
+    if (resultsStorage.length !== null && resultsStorage.length > 0) {
+      setStorage();
+    }
+  }, [resultsStorage]);
 
   let [pokemon1, pokemon2]: Pokemon[] = usePokemonPair(IdPair);
   const [nextPokemon1, nextPokemon2]: Pokemon[] = usePokemonPair(nextIdPair);
@@ -44,13 +61,94 @@ export default function App({ navigation }) {
 
   useEffect(() => {
     if (nextPokemon1 && nextPokemon2) {
-      checkAndCreate([nextPokemon1, nextPokemon2]);
-
       if (!alreadyRated.includes(IdPair)) {
         setAlreadyRated([...alreadyRated, IdPair]);
       }
     }
   }, [nextPokemon1 && nextPokemon2]);
+
+  function handleResultsStorage(
+    pokemon: Pokemon,
+    pokemon2: Pokemon,
+    winner: number
+  ) {
+    if (
+      !(resultsStorage.filter((e) => e.id === pokemon.id).length > 0) &&
+      !(resultsStorage.filter((e) => e.id === pokemon2.id).length > 0)
+    ) {
+      setResultsStorage([
+        ...resultsStorage,
+        {
+          id: pokemon.id,
+          name: pokemon.name,
+          image: pokemon.sprites.front_default,
+          votedFor: winner == 1 ? 1 : 0,
+          votedAgainst: winner == 1 ? 0 : 1,
+        },
+        {
+          id: pokemon2.id,
+          name: pokemon2.name,
+          image: pokemon2.sprites.front_default,
+          votedFor: winner == 2 ? 1 : 0,
+          votedAgainst: winner == 2 ? 0 : 1,
+        },
+      ]);
+    } else if (resultsStorage.filter((e) => e.id === pokemon.id).length > 0) {
+      console.log(pokemon.name + " is already in resultsStorage");
+      const index = resultsStorage.findIndex(
+        (result) => result.id === pokemon.id
+      );
+      winner == 1
+        ? (resultsStorage[index].votedFor += 1)
+        : (resultsStorage[index].votedAgainst += 1);
+
+      setResultsStorage([
+        ...resultsStorage,
+        {
+          id: pokemon2.id,
+          name: pokemon2.name,
+          image: pokemon2.sprites.front_default,
+          votedFor: winner == 2 ? 1 : 0,
+          votedAgainst: winner == 2 ? 0 : 1,
+        },
+      ]);
+    } else if (resultsStorage.filter((e) => e.id === pokemon2.id).length > 0) {
+      console.log(pokemon2.name + " is already in resultsStorage");
+      const index = resultsStorage.findIndex(
+        (result) => result.id === pokemon2.id
+      );
+      winner == 2
+        ? (resultsStorage[index].votedFor += 1)
+        : (resultsStorage[index].votedAgainst += 1);
+
+      setResultsStorage([
+        ...resultsStorage,
+        {
+          id: pokemon.id,
+          name: pokemon.name,
+          image: pokemon.sprites.front_default,
+          votedFor: winner == 1 ? 1 : 0,
+          votedAgainst: winner == 1 ? 0 : 1,
+        },
+      ]);
+    } else {
+      const index1 = resultsStorage.findIndex(
+        (result) => result.id === pokemon.id
+      );
+      winner == 1
+        ? (resultsStorage[index1].votedFor += 1)
+        : (resultsStorage[index1].votedAgainst += 1);
+
+      const index2 = resultsStorage.findIndex(
+        (result) => result.id === pokemon2.id
+      );
+      winner == 2
+        ? (resultsStorage[index2].votedFor += 1)
+        : (resultsStorage[index2].votedAgainst += 1);
+    }
+  }
+
+  console.log("Original: " + resultsStorage.length);
 
   return (
     <>
@@ -60,7 +158,7 @@ export default function App({ navigation }) {
           <View className="flex flex-col items-center justify-center space-y-5">
             <TouchableOpacity
               onPress={async () => {
-                await fetch("http://192.168.50.136:8000/pokemon/rate", {
+                await fetch("http://192.168.0.136:8000/pokemon/rate", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -71,6 +169,8 @@ export default function App({ navigation }) {
                   }),
                 });
                 fetchNextPair();
+
+                handleResultsStorage(pokemon1, pokemon2, 1);
               }}
             >
               <View>
@@ -92,7 +192,7 @@ export default function App({ navigation }) {
             <Text className="text-lg font-bold text-pokeorange">VS.</Text>
             <TouchableOpacity
               onPress={async () => {
-                await fetch("http://192.168.50.136:8000/pokemon/rate", {
+                await fetch("http://192.168.0.136:8000/pokemon/rate", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -103,6 +203,8 @@ export default function App({ navigation }) {
                   }),
                 });
                 fetchNextPair();
+
+                handleResultsStorage(pokemon1, pokemon2, 2);
               }}
             >
               <View>
