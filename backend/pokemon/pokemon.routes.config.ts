@@ -29,6 +29,18 @@ export class PokemonRoutes {
       });
 
     this.app
+      .route(`/pokemon/:id1/:id2`)
+      .get(async (req: express.Request, res: express.Response) => {
+        const pokemon = await prisma.pokemon.findMany({
+          where: {
+            id: { in: [Number(req.params.id1), Number(req.params.id2)] },
+          },
+        });
+
+        res.status(200).send([pokemon[0], pokemon[1]]);
+      });
+
+    this.app
       .route(`/pokemon/rate`)
       .post(async (req: express.Request, res: express.Response) => {
         const pokemon = await prisma.pokemon.update({
