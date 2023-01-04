@@ -3,8 +3,15 @@ import { Text, View, Image, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { getRandomPair } from "../utils/getRandomId";
 import { usePokemonPair } from "../utils/usePokemonPair";
-import { Pokemon } from "pokenode-ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+type Pokemon = {
+  id: number;
+  name: string;
+  image: string;
+  votedFor: string;
+  votedAgainst: string;
+};
 
 export default function App({ navigation }) {
   const [alreadyRated, setAlreadyRated] = useState([]);
@@ -27,7 +34,7 @@ export default function App({ navigation }) {
   }, []);
 
   const [IdPair, setIdPair] = useState(getRandomPair(alreadyRated));
-  const [nextIdPair, setNextIdPair] = useState(getRandomPair([[]]));
+  const [nextIdPair, setNextIdPair] = useState(getRandomPair([alreadyRated]));
 
   useEffect(() => {
     async function setStorage() {
@@ -81,20 +88,19 @@ export default function App({ navigation }) {
         {
           id: pokemon.id,
           name: pokemon.name,
-          image: pokemon.sprites.front_default,
+          image: pokemon.image,
           votedFor: winner == 1 ? 1 : 0,
           votedAgainst: winner == 1 ? 0 : 1,
         },
         {
           id: pokemon2.id,
           name: pokemon2.name,
-          image: pokemon2.sprites.front_default,
+          image: pokemon2.image,
           votedFor: winner == 2 ? 1 : 0,
           votedAgainst: winner == 2 ? 0 : 1,
         },
       ]);
     } else if (resultsStorage.filter((e) => e.id === pokemon.id).length > 0) {
-      console.log(pokemon.name + " is already in resultsStorage");
       const index = resultsStorage.findIndex(
         (result) => result.id === pokemon.id
       );
@@ -107,13 +113,12 @@ export default function App({ navigation }) {
         {
           id: pokemon2.id,
           name: pokemon2.name,
-          image: pokemon2.sprites.front_default,
+          image: pokemon2.image,
           votedFor: winner == 2 ? 1 : 0,
           votedAgainst: winner == 2 ? 0 : 1,
         },
       ]);
     } else if (resultsStorage.filter((e) => e.id === pokemon2.id).length > 0) {
-      console.log(pokemon2.name + " is already in resultsStorage");
       const index = resultsStorage.findIndex(
         (result) => result.id === pokemon2.id
       );
@@ -126,7 +131,7 @@ export default function App({ navigation }) {
         {
           id: pokemon.id,
           name: pokemon.name,
-          image: pokemon.sprites.front_default,
+          image: pokemon.image,
           votedFor: winner == 1 ? 1 : 0,
           votedAgainst: winner == 1 ? 0 : 1,
         },
@@ -148,8 +153,6 @@ export default function App({ navigation }) {
     }
   }
 
-  console.log("Original: " + resultsStorage.length);
-
   return (
     <>
       <StatusBar style="light" />
@@ -158,7 +161,7 @@ export default function App({ navigation }) {
           <View className="flex flex-col items-center justify-center space-y-5">
             <TouchableOpacity
               onPress={async () => {
-                await fetch("http://192.168.0.136:8000/pokemon/rate", {
+                await fetch("http://192.168.50.136:8000/pokemon/rate", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -176,23 +179,20 @@ export default function App({ navigation }) {
               <View>
                 <Image
                   source={{
-                    uri: pokemon1.sprites.front_default,
+                    uri: pokemon1.image,
                     width: 200,
                     height: 200,
                   }}
                 ></Image>
-                <Text className="self-center capitalize text-pokeorange">
+                <Text className="self-center font-bold capitalize text-pokeorange">
                   {pokemon1.name}
-                </Text>
-                <Text className="self-center capitalize text-pokeorange">
-                  {pokemon1.id}
                 </Text>
               </View>
             </TouchableOpacity>
             <Text className="text-lg font-bold text-pokeorange">VS.</Text>
             <TouchableOpacity
               onPress={async () => {
-                await fetch("http://192.168.0.136:8000/pokemon/rate", {
+                await fetch("http://192.168.50.136:8000/pokemon/rate", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -210,22 +210,19 @@ export default function App({ navigation }) {
               <View>
                 <Image
                   source={{
-                    uri: pokemon2.sprites.front_default,
+                    uri: pokemon2.image,
                     width: 200,
                     height: 200,
                   }}
                 ></Image>
-                <Text className="self-center capitalize text-pokeorange">
+                <Text className="self-center font-bold capitalize text-pokeorange">
                   {pokemon2.name}
-                </Text>
-                <Text className="self-center capitalize text-pokeorange">
-                  {pokemon2.id}
                 </Text>
               </View>
             </TouchableOpacity>
           </View>
         ) : (
-          <Text>Loading...</Text>
+          <Text className="font-extrabold text-pokeorange">Loading...</Text>
         )}
       </View>
     </>
