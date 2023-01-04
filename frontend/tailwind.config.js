@@ -9,6 +9,7 @@ module.exports = {
     extend: {
       colors: {
         pokeblue: "#3d6d79",
+        pokedarkblue: "#1b3941",
         pokeorange: "#d69d66",
         pokewhite: "#e0e2ee",
       },
