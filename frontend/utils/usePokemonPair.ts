@@ -7,14 +7,25 @@ export function usePokemonPair([id1, id2]: number[]) {
 
   useEffect(() => {
     async function getPokemon() {
-      const client = new PokemonClient({
-        cacheOptions: { maxAge: 5000, exclude: { query: false } },
-      });
+      //SELF API
+      const response = await fetch(
+        "http://192.168.50.136:8000/pokemon/" + id1 + "/" + id2
+      );
 
-      const pokemon1 = await client.getPokemonById(id1);
-      const pokemon2 = await client.getPokemonById(id2);
-      setPokemon1(pokemon1);
-      setPokemon2(pokemon2);
+      const pokemon = await response.json();
+      console.log(pokemon);
+      setPokemon1(pokemon[0]);
+      setPokemon2(pokemon[1]);
+
+      //POKEAPI
+      // const client = new PokemonClient({
+      //   cacheOptions: { maxAge: 5000, exclude: { query: false } },
+      // });
+
+      // const pokemon1 = await client.getPokemonById(id1);
+      // const pokemon2 = await client.getPokemonById(id2);
+      // setPokemon1(pokemon1);
+      // setPokemon2(pokemon2);
     }
 
     getPokemon();
