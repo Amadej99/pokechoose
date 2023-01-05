@@ -7,6 +7,7 @@ import HomeScreen from "./pages/HomeScreen";
 import ChoosingScreen from "./pages/ChoosingScreen";
 import ResultsScreen from "./pages/ResultsScreen";
 import PrivateResultsScreen from "./pages/PrivateResultsScreen";
+import SettingsScreen from "./pages/SettingsScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +43,15 @@ function App() {
         <Stack.Screen
           name="PrivateResultsScreen"
           component={PrivateResultsScreen}
+          options={{
+            headerTransparent: true,
+            title: "",
+            headerTintColor: "#fff",
+          }}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="SettingsScreen"
+          component={SettingsScreen}
           options={{
             headerTransparent: true,
             title: "",

@@ -39,6 +39,15 @@ const PrivateResultsScreen = ({ navigation }) => {
 
   console.log(results);
 
+  if (results.length === 0)
+    return (
+      <View className="flex min-h-screen items-center justify-center bg-pokeblue">
+        <Text className="text-xl font-bold text-pokeorange">
+          Play the game first!
+        </Text>
+      </View>
+    );
+
   return (
     <View className="min-h-screen bg-pokeblue">
       <ScrollView className="mt-24 flex flex-col space-y-2 bg-pokeblue">
