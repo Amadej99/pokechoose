@@ -157,6 +157,7 @@ export default function App({ navigation }) {
     <>
       <StatusBar style="light" />
       <View className="flex min-h-screen items-center justify-center bg-pokeblue">
+        <Text className="text-xl font-bold text-pokeorange">Pick one!</Text>
         {pokemon1 && pokemon2 ? (
           <View className="flex flex-col items-center justify-center space-y-5">
             <TouchableOpacity
