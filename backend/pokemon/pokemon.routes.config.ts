@@ -1,5 +1,5 @@
-import express from 'express';
-import { prisma } from '../prisma/database';
+import express from "express";
+import { prisma } from "../prisma/database";
 
 type Pokemon = {
   id: number;
@@ -12,7 +12,7 @@ export class PokemonRoutes {
 
   constructor(app: express.Application) {
     this.app = app;
-    this.name = 'PokemonRoutes';
+    this.name = "PokemonRoutes";
     this.configureRoutes();
   }
   getName() {
@@ -65,7 +65,7 @@ export class PokemonRoutes {
           },
         });
 
-        res.status(200).send(pokemon.name + ' has been upvoted!');
+        res.status(200).send(pokemon.name + " has been upvoted!");
       });
 
     this.app
@@ -82,7 +82,7 @@ export class PokemonRoutes {
           },
         });
 
-        res.status(200).send(pokemon.name + ' has been downvoted!');
+        res.status(200).send(pokemon.name + " has been downvoted!");
       });
 
     this.app
@@ -111,9 +111,13 @@ export class PokemonRoutes {
             b.votedFor / (b.votedFor + b.votedAgainst) -
               a.votedFor / (a.votedFor + a.votedAgainst) ==
             0
-          )
-            return b.votedFor - a.votedFor;
-          else
+          ) {
+            console.log("Equal: " + a.name + " " + b.name);
+            console.log(
+              a.votedFor + a.votedAgainst + " " + b.votedFor + b.votedAgainst
+            );
+            return b.votedFor + b.votedAgainst - (a.votedFor + a.votedAgainst);
+          } else
             return (
               b.votedFor / (b.votedFor + b.votedAgainst) -
               a.votedFor / (a.votedFor + a.votedAgainst)
